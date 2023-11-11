@@ -1,38 +1,227 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         body {
-            text-align: center;
+            text-align: flex;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
         }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+
         #score {
             font-size: 2em;
             color: #333;
+            margin-bottom: 20px;
         }
-        #clicker {
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex;
+            margin-top: 50px;
+        }
+
+        #clicker1,
+        #upgrade-clicker1,
+        #upgrade-clicker2,
+        #x2-clicker {
             margin-top: 20px;
+            margin-bottom: 10px;
             padding: 10px 20px;
-            font-size: 2em;
-            background-color: #007BFF;
-            color: white;
+            font-size: 1.5em;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
+
+        #clicker1 {
+            background-color: #007BFF;
+            color: white;
+            margin-right: 20px;
+        }
+
+        #unlock-it-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: flex;
+            justify-content: flex-end;
+        margin-bottom: 20px;
+        }
+
+        #unlock-it {
+            background-color: #444141;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: flex;
+            margin-right: 20px;
+            margin-top: 20px;
+            display: flex;
+            align-items: flex;
+            justify-content: flex;
+            flex-direction: column;
+        }
+
+        #unlock-it span {
+            margin-right: 10px;
+            font-size: 1.2em;
+            color: #fffafa;
+        }
+
+        #unlock-it button {
+            font-size: 1.2em;
+            color: rgb(0, 0, 0);
+        }
     </style>
 </head>
+
 <body>
-    <h1>Clicker Game</h1>
-    <p id="score">Score: 0</p>
-    <button id="clicker">Click me!</button>
+    <div class="game-container">
+        <h1>Clicker Game</h1>
+        <p id="score">Score: 0</p>
+        <button id="clicker1">Click me!</button>
+        <div id="unlock-it-container">
+            <div id="unlock-it">
+                <span>Available at 100:</span>
+                <button id="upgrade-clicker1" disabled>Upgrade clicker</button>
+                <span>Available at 200:</span>
+                <button id="upgrade-clicker2" disabled>Upgrade clicker</button>
+                <span>Available at 500</span>
+                <button id="x2-clicker" disabled>x2 Clicks (Cost: 500)</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        var score = 0;
-        document.getElementById('clicker').addEventListener('click', function() {
+        var score = 999;
+        var intervalId;
+        var upgradeCost1 = 100;
+        var upgradeCost2 = 200;
+        var x2ClickCost = 500;
+
+        function updateScore() {
+            var formattedScore = formatScore(score);
+            document.getElementById('score').textContent = 'Score: ' + formattedScore;
+        }
+
+        function formatScore(score) {
+            if (score >= 1000) {
+                return (score / 1000).toFixed(2) + 'K';
+            } else {
+                return score.toString();
+            }
+        }
+
+        function enableUpgradeButton1() {
+            document.getElementById('upgrade-clicker1').removeAttribute('disabled');
+        }
+
+        function disableUpgradeButton1() {
+            document.getElementById('upgrade-clicker1').setAttribute('disabled', true);
+        }
+
+        function enableUpgradeButton2() {
+            document.getElementById('upgrade-clicker2').removeAttribute('disabled');
+        }
+
+        function disableUpgradeButton2() {
+            document.getElementById('upgrade-clicker2').setAttribute('disabled', true);
+        }
+
+        function enableX2Clicker() {
+            document.getElementById('x2-clicker').removeAttribute('disabled');
+        }
+
+        function disableX2Clicker() {
+            document.getElementById('x2-clicker').setAttribute('disabled', true);
+        }
+
+        document.getElementById('clicker1').addEventListener('click', function () {
             score++;
-            document.getElementById('score').textContent = 'Score: ' + score;
+            updateScore();
+
+            if (score >= 100 && !intervalId) {
+                enableUpgradeButton1();
+            }
+            if (score >= 200 && !intervalId) {
+                enableUpgradeButton2();
+            }
+            if (score >= 200 && !intervalId) {
+                enableX2Clicker();
+            }
+        });
+
+        document.getElementById('upgrade-clicker1').addEventListener('click', function () {
+            if (score >= upgradeCost1) {
+                score -= upgradeCost1;
+                updateScore();
+                if (score <= 100 && !intervalId) {
+                    disableUpgradeButton1();
+                }
+                if (score <= 200 && !intervalId) {
+                    disableUpgradeButton2();
+                }
+                if (score <= 500 && !intervalId) {
+                    disableX2Clicker();
+                }
+                setInterval(function () {
+                    score++;
+                    updateScore();
+                }, 2000);
+            }
+        });
+
+        document.getElementById('upgrade-clicker2').addEventListener('click', function () {
+            if (score >= upgradeCost2) {
+                score -= upgradeCost2;
+                updateScore();
+                if (score <= 100 && !intervalId) {
+                    disableUpgradeButton1();
+                }
+                if (score <= 200 && !intervalId) {
+                    disableUpgradeButton2();
+                }
+                if (score <= 500 && !intervalId) {
+                    disableX2Clicker();
+                }
+                setInterval(function () {
+                    score++;
+                    updateScore();
+                }, 1000);
+            }
+        });
+
+        document.getElementById('x2-clicker').addEventListener('click', function () {
+            if (score >= x2ClickCost) {
+                score -= x2ClickCost;
+                updateScore();
+                if (score <= 100 && !intervalId) {
+                    disableUpgradeButton1();
+                }
+                if (score <= 200 && !intervalId) {
+                    disableUpgradeButton2();
+                }
+                if (score <= 500 && !intervalId) {
+                    disableX2Clicker();
+                }
+
+
+                document.getElementById('clicker1').addEventListener('click', function () {
+                    score = score+2;
+                    updateScore();
+                });
+            }
         });
     </script>
 </body>
+
 </html>
